@@ -1,4 +1,4 @@
-class MultiPing implements Runnable {
+public class MultiPing implements Runnable {
     private Thread t;
 
     private final Address address;

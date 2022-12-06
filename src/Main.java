@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         Address[] addressArr = Address.getAllPossibleAddressesFromNetwork();
@@ -7,7 +9,7 @@ public class Main {
         Address[] pingable = Address.multiPing(addressArr);
 
         for (Address address : pingable)
-            System.out.println(address);
+            System.out.println(address + "\t" +Arrays.toString(PortTester.testForOpenPorts(address)));
 
         long b = System.currentTimeMillis();
 

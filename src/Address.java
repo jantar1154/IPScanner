@@ -117,15 +117,19 @@ public class Address {
 
     public static Address[] multiPing(Address[] addresses) throws InterruptedException {
         Thread[] threads = new Thread[addresses.length];
+
         for (int i = 0; i < addresses.length; i++)
             threads[i] = (new MultiPing(addresses[i])).start();
-        for (Thread t : threads)
-            t.join();
+
+        for (Thread t : threads) t.join();
+
         Address[] rtn = new Address[pingable.size()];
+
         for (int j = 0; j < pingable.size(); ) {
             rtn[j] = pingable.get(j);
             j++;
         }
+
         return rtn;
     }
 

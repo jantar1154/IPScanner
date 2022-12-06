@@ -1,7 +1,7 @@
 import java.io.IOException;
 import java.net.Socket;
 
-class PortTester implements Runnable {
+public class PortTester implements Runnable {
     private Thread t;
 
     private final Address address;
@@ -21,7 +21,7 @@ class PortTester implements Runnable {
             t.join();
         int[] rtn = new int[Address.openPorts.size()];
         for (int j = 0; j < Address.openPorts.size(); ) {
-            rtn[j] = ((Integer)Address.openPorts.get(j)).intValue();
+            rtn[j] = Address.openPorts.get(j);
             j++;
         }
         Address.openPorts.clear();
@@ -31,9 +31,9 @@ class PortTester implements Runnable {
     public void run() {
         try {
             Socket socket = new Socket(this.address.toString(), this.port);
-            Address.openPorts.add(Integer.valueOf(this.port));
+            Address.openPorts.add(this.port);
             socket.close();
-        } catch (IOException iOException) {}
+        } catch (IOException ignored) {}
     }
 
     public Thread start() {
