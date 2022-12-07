@@ -1,5 +1,10 @@
-class MultiPing implements Runnable {
-    private Thread t;
+
+/**
+ * This class calls the ping() function on many threads
+ * Use MultiPing.start()
+ */
+public class MultiPing implements Runnable {
+    private Thread thr;
 
     private final Address address;
 
@@ -13,10 +18,10 @@ class MultiPing implements Runnable {
     }
 
     public Thread start() {
-        if (this.t == null) {
-            this.t = new Thread(this);
-            this.t.start();
-            return this.t;
+        if (this.thr == null) {
+            this.thr = new Thread(this);
+            this.thr.start();
+            return this.thr;
         }
         return null;
     }
