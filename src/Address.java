@@ -1,9 +1,5 @@
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,22 +22,24 @@ public class Address {
         this.numbers = address;
     }
 
+    // Pings this address
     public boolean ping() {
         try {
-            Inet4Address inet = (Inet4Address) Inet4Address.getByName(toString());
+            Inet4Address inet = (Inet4Address) Inet4Address.getByName(this.toString());
             return inet.isReachable(1000);
         } catch (IOException e) {
             return false;
         }
     }
 
+    // Returns an array of every possible IP address of network device running this program is in
     public static Address[] getAllPossibleAddressesFromNetwork() {
         Address netAddress = getNetAddress();
         Address lastAddress = getLastAddress();
-        System.out.println("Last address: " + lastAddress);
         return allFromRange(netAddress, lastAddress);
     }
 
+    // Gets last IP on your network before broadcast
     public static Address getLastAddress() {
         Address localAddress = getLocalAddress();
         Address netMask = prefixLengthToMask(getMask());
@@ -54,6 +52,7 @@ public class Address {
         });
     }
 
+    // Returns IP address of your network
     public static Address getNetAddress() {
 
         Address localAddress = getLocalAddress();
@@ -67,6 +66,7 @@ public class Address {
         });
     }
 
+    // "Converts" prefix length (/24) to mask (255.255.255.0)
     private static Address prefixLengthToMask(short netMaskLength) {
         return switch (netMaskLength) {
             case 8 -> new Address("255.0.0.0");
@@ -79,6 +79,7 @@ public class Address {
         };
     }
 
+    // Creates an array containing every possible IP address between start and last argument
     private static Address[] allFromRange(Address start, Address last) {
         List<Address> addressList = new ArrayList<>();
 
@@ -115,13 +116,20 @@ public class Address {
         return list;
     }
 
-    public static Address[] multiPing(Address[] addresses) throws InterruptedException {
+    // Pings every IP address from array addresses in parallel
+    public static Address[] multiPing(Address[] addresses, int divider) throws InterruptedException {
         Thread[] threads = new Thread[addresses.length];
 
-        for (int i = 0; i < addresses.length; i++)
-            threads[i] = (new MultiPing(addresses[i])).start();
+        for (int i = 0; i < divider; i++) {
+            for (int j = 0; j < addresses.length/divider; j++) {
+                int index = j + (i* addresses.length/divider);
+                threads[index] = new MultiPing(addresses[index]).start();
+                System.out.println(threads[index] + "\tindex: " + index);
+            }
+            Thread.sleep(1000);
+        }
 
-        for (Thread t : threads) t.join();
+        //for (Thread t : threads) if (t != null) t.join();
 
         Address[] rtn = new Address[pingable.size()];
 
@@ -133,6 +141,7 @@ public class Address {
         return rtn;
     }
 
+    // Returns IP address of device running this program
     public static Address getLocalAddress() {
         String inetAddress;
         try {
@@ -143,6 +152,7 @@ public class Address {
         return new Address(inetAddress);
     }
 
+    // Returns netmask of network in which is device running this program
     public static short getMask() {
         InetAddress localHost;
         NetworkInterface networkInterface;
@@ -159,6 +169,8 @@ public class Address {
         return (networkInterface.getInterfaceAddresses().get(0)).getNetworkPrefixLength();
     }
 
+    // Returns instance of this class in String
+    @Override
     public String toString() {
         return this.numbers[0] + "."
                 + this.numbers[1] + "."

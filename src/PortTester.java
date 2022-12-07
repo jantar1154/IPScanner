@@ -13,6 +13,7 @@ public class PortTester implements Runnable {
         this.port = port;
     }
 
+    // Finds every open port on IP address by opening it
     public static int[] testForOpenPorts(Address address) throws InterruptedException {
         Thread[] threads = new Thread[1024];
         for (int i = 0; i < 1024; i++)
